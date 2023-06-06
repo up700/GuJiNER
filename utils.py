@@ -25,7 +25,7 @@ MODEL_CLASSES = {
 MODEL_PATH_MAP = {
     # 'bert': 'hfl/chinese-bert-wwm-ext',
     # 'roberta': '/home/zhangxinghua/roberta-classical-chinese-base-char',
-    'roberta': '/home/zhangxinghua/roberta-classical-chinese-large-char',
+    'roberta': './roberta-classical-chinese-large-char',
     # 'roberta': '/home/zhangxinghua/GuJi_NER/BERT-NER/save_model_pseudo'
     'bert': '/home/zhangxinghua/sikuroberta'
 }

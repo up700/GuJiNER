@@ -198,12 +198,12 @@ def train(args, model, tokenizer, labels):
 
                 if best_score < results['span_f1']:
                     best_score = results['span_f1']
-                    output_dir = os.path.join(args.output_dir, "best_checkpoint")
+                    output_dir = os.path.join(args.output_dir, "best_checkpoint_IB"+str(args.max_span_len))
                     # fitlog.add_best_metric({"dev-f1": results['span_f1']})
                 else:
                     output_dir = args.output_dir
 
-                model_save(args, output_dir, model, tokenizer)
+                # model_save(args, output_dir, model, tokenizer)
 
     return global_step, tr_loss / global_step
 
