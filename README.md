@@ -27,7 +27,7 @@
 │  trainer.py                             #BIO方式的训练器
 │
 ├─data
-│  ├─Guwen-large                          #
+│  ├─Guwen-large                          #以SPAN方式训练所需数据
 │  ├─ner_data_1                           #五折交叉验证-第一折数据
 │  ├─ner_data_2                           #五折交叉验证-第二折数据
 │  ├─ner_data_3                           #五折交叉验证-第三折数据
@@ -40,23 +40,23 @@
 │
 ├─models                                  #以SPAN方式进行训练相关的model
 ├─predict
-│      combine.py                         #生成五折交叉验证的结果
-│      combine_len.py                     #生成最终的融合结果（需先执行combine.py）
-│      conflicts_filter.json              #训练集中标注冲突的实体
-│      predict.py                         #生成以BIO方式训练的测试集结果
-│      predict_know.py                    #生成引入古文篇章知识训练的测试集结果
-│      predict_slide.py                   #生成引入古文篇章知识并使用滑窗机制进训练的测试集结果
-│      submission_test_1.txt              #在第一折数据训练模型的测试集预测结果
-│      submission_test_2.txt              #在第二折数据训练模型的测试集预测结果
-│      submission_test_3.txt              #在第三折数据训练模型的测试集预测结果
-│      submission_test_4.txt              #在第四折数据训练模型的测试集预测结果
-│      submission_test_5.txt              #在第五折数据训练模型的测试集预测结果
-│      submission_test_IB_10.txt          #SPAN模型最大长度为10的测试集预测结果
-│      submission_test_IB_4.txt           #SPAN模型最大长度为4的测试集预测结果
-│      submission_test_Kfold.txt          #五折交叉验证的最终融合结果
-│      submission_test_know.txt           #引入古文所在篇章知识的模型在测试集的预测结果
-│      submission_test_slide.txt          #引入古文所在篇章知识和滑动窗口的模型在测试集的预测结果
-│      test_submission_submit.txt         #**最终提交结果**
+│  ├─combine.py                           #生成五折交叉验证的结果
+│  ├─combine_len.py                       #生成最终的融合结果（需先执行combine.py）
+│  ├─conflicts_filter.json                #训练集中标注冲突的实体
+│  ├─predict.py                           #生成以BIO方式训练的测试集结果
+│  ├─predict_know.py                      #生成引入古文篇章知识训练的测试集结果
+│  ├─predict_slide.py                     #生成引入古文篇章知识并使用滑窗机制进训练的测试集结果
+│  ├─submission_test_1.txt                #在第一折数据训练模型的测试集预测结果
+│  ├─submission_test_2.txt                #在第二折数据训练模型的测试集预测结果
+│  ├─submission_test_3.txt                #在第三折数据训练模型的测试集预测结果
+│  ├─submission_test_4.txt                #在第四折数据训练模型的测试集预测结果
+│  ├─submission_test_5.txt                #在第五折数据训练模型的测试集预测结果
+│  ├─submission_test_IB_10.txt            #SPAN模型最大长度为10的测试集预测结果
+│  ├─submission_test_IB_4.txt             #SPAN模型最大长度为4的测试集预测结果
+│  ├─submission_test_Kfold.txt            #五折交叉验证的最终融合结果
+│  ├─submission_test_know.txt             #引入古文所在篇章知识的模型在测试集的预测结果
+│  ├─submission_test_slide.txt            #引入古文所在篇章知识和滑动窗口的模型在测试集的预测结果
+│  └─test_submission_submit.txt           #**最终提交结果**
 │
 ├─utils                                   #以BIO方式训练和预测过程中常用到的工具函数
 └─utils_IB                                #以SPAN方式训练和预测过程中常用到的工具函数
