@@ -2,13 +2,12 @@ import os
 import logging
 import argparse
 from tqdm import tqdm
-import json
 
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
-from utils import init_logger, load_tokenizer, get_seq_labels, MODEL_CLASSES
+from utils.utils_slide import init_logger, load_tokenizer, get_seq_labels, MODEL_CLASSES
 
 logger = logging.getLogger(__name__)
 
@@ -41,22 +40,6 @@ def load_model(pred_config, args, device):
 
     return model
 
-
-# def read_input_file(input_path):
-#     """读取预测的文件"""
-#     lines = []
-#     eids = []
-#     sids = []
-#     with open(input_path, 'r', encoding='utf-8') as f:
-#         data = json.load(f)
-#     for k, v in data.items():
-#         for sent in data[k]['dialogue']:
-#             words = list(sent['speaker'] + '：' + sent['sentence'])
-#             lines.append(words)
-#             eids.append(k)
-#             sids.append(sent['sentence_id'])
-
-#     return (lines, eids, sids)
 
 def read_input_file(input_path):
     """读取预测的文件"""
@@ -97,12 +80,20 @@ def convert_input_file_to_tensor_dataset(lines,
     for words in lines:
         tokens = []
         seq_label_mask = []
+        flag = False
         for word in words:
+            if word == "#":
+                flag = True
+                continue
             word_tokens = tokenizer.tokenize(word)
             if not word_tokens:
                 word_tokens = [unk_token]  # 处理UNK
             tokens.extend(word_tokens)
-            seq_label_mask.extend([pad_token_label_id + 1] + [pad_token_label_id] * (len(word_tokens) - 1))
+            if not flag:
+                seq_label_mask.extend([pad_token_label_id + 1] + [pad_token_label_id] * (len(word_tokens) - 1))
+            else:
+                seq_label_mask.extend([pad_token_label_id] + [pad_token_label_id] * (len(word_tokens) - 1))
+
 
         # 添加 [SEP]
         tokens += [sep_token]
@@ -203,12 +194,16 @@ def predict(pred_config):
                 seq_preds_list[i].append(seq_label_map[seq_preds[i][j]])
 
     assert len(seq_preds_list) == len(lines)
-    # 保存文件
-    # 帝曰：「{玄齡|PER}、{如晦|PER}不以勳舊進，特其才可與治天下者，{師合|PER}欲以此離間吾君臣邪？」斥嶺表。
     outputs = []
     for i in range(len(seq_preds_list)):
         pred_seq = seq_preds_list[i]
-        org_words = lines[i]
+        org_words_ = lines[i]
+        # print(org_words_)
+        org_words = []
+        for ow in org_words_:
+            if ow == "#":
+                break
+            org_words.append(ow)
         print(" ".join(pred_seq))
         sent = ""
         flag = False
@@ -236,18 +231,9 @@ def predict(pred_config):
         if flag:
             sent += "|"+tmp+"}"
             flag = False
-        print(sent)
 
         outputs.append(sent)
 
-
-        # eid = eids[i]
-        # sid = sids[i]
-        # if eid not in outputs:
-        #     outputs[eid] = {}
-        #     outputs[eid][sid] = ' '.join(pred_seq[3:])  # 只保留句子的BIO标签，删去了speaker的BIO标签
-        # else:
-        #     outputs[eid][sid] = ' '.join(pred_seq[3:])
 
     pred_path = os.path.join(pred_config.test_output_file)
     with open(pred_path, 'w', encoding='utf-8') as f:
@@ -262,9 +248,9 @@ if __name__ == "__main__":
     init_logger()
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--test_input_file", default="GuNER2023_test_public.txt", type=str, help="Input file for prediction")
-    parser.add_argument("--test_output_file", default="submission_test_slide.txt", type=str, help="Output file for prediction")
-    parser.add_argument("--model_dir", default="./save_model_know_slide", type=str, help="Path to save, load model")
+    parser.add_argument("--test_input_file", default="./data/ner_data_know/GuNER2023_test_public_know.txt", type=str, help="Input file for prediction")
+    parser.add_argument("--test_output_file", default="submission_test_know.txt", type=str, help="Output file for prediction")
+    parser.add_argument("--model_dir", default="./save_model_know", type=str, help="Path to save, load model")
 
     parser.add_argument("--batch_size", default=32, type=int, help="Batch size for prediction")
     parser.add_argument("--no_cuda", action="store_true", help="Avoid using CUDA when available")
@@ -272,4 +258,3 @@ if __name__ == "__main__":
     pred_config = parser.parse_args()
     predict(pred_config)
 
-    # CUDA_VISIBLE_DEVICES=1 python predict.py --test_output_file submission_test_5.txt --model_dir ./save_model_5

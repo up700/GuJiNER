@@ -1,7 +1,6 @@
 import os
 import random
 import logging
-
 import torch
 import numpy as np
 from seqeval.metrics import precision_score, recall_score, f1_score, classification_report
@@ -9,7 +8,7 @@ from seqeval.metrics import precision_score, recall_score, f1_score, classificat
 from transformers import BertConfig, RobertaConfig
 # from transformers import BertTokenizer, RobertaTokenizer, AutoTokenizer
 from transformers import AutoTokenizer
-from modeling_nerbert import NERBERT, NERRoBERTa
+from utils.modeling_nerbert import NERBERT, NERRoBERTa
 
 # 模型类别
 MODEL_CLASSES = {

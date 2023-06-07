@@ -20,11 +20,11 @@ import fitlog
 
 from tqdm import tqdm, trange
 from transformers import AutoConfig, AutoTokenizer
-from eval_metric import span_f1_prune
+from utils.eval_metric import span_f1_prune
 
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
-from engine_utils import *
+from utils.engine_utils import *
 from utils_IB.datasets import collate_fn, get_labels, load_examples, SpanNerDataset
 from models.bn_bert_ner import BertSpanNerBN
 
@@ -301,7 +301,7 @@ def fast_evaluate(args, ckpt_dir, config, tokenizer, labels,
     return results, predictions
 
 def convert_format(file, K):
-    fw = open("submission_test_IB_"+str(K)+".txt", "w", encoding="utf-8")
+    fw = open("predict/submission_test_IB_"+str(K)+".txt", "w", encoding="utf-8")
     sen = ""
     tmp = "O"
     with open(file, "r", encoding="utf-8") as f:
@@ -400,5 +400,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # fitlog.finish()
-# CUDA_VISIBLE_DEVICES=2 python -u main_conll.py --epoch 30 --do_train --batch_size 64 --gama 0.001 --beta 0.01 --gpu_id 2 --lr 0.00001 --switch_ratio 0.5 --data_dir /data/zhangxinghua/MINER-master/data/conll2003/ --output_dir /data/zhangxinghua/MINER-master/out/ --model_name_or_path /data/zhangxinghua/bert-base-uncased --batch_size 32

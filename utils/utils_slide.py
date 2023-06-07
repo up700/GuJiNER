@@ -9,7 +9,7 @@ from seqeval.metrics import precision_score, recall_score, f1_score, classificat
 from transformers import BertConfig, RobertaConfig
 from transformers import BertTokenizer, RobertaTokenizer, AutoTokenizer
 
-from modeling_nerbert_slide import NERBERT, NERRoBERTa
+from utils.modeling_nerbert_slide import NERBERT, NERRoBERTa
 
 # 模型类别
 MODEL_CLASSES = {

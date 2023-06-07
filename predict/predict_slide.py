@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
-from utils_slide import init_logger, load_tokenizer, get_seq_labels, MODEL_CLASSES
+from utils.utils_slide import init_logger, load_tokenizer, get_seq_labels, MODEL_CLASSES
 
 logger = logging.getLogger(__name__)
 
@@ -42,22 +42,6 @@ def load_model(pred_config, args, device):
     return model
 
 
-# def read_input_file(input_path):
-#     """读取预测的文件"""
-#     lines = []
-#     eids = []
-#     sids = []
-#     with open(input_path, 'r', encoding='utf-8') as f:
-#         data = json.load(f)
-#     for k, v in data.items():
-#         for sent in data[k]['dialogue']:
-#             words = list(sent['speaker'] + '：' + sent['sentence'])
-#             lines.append(words)
-#             eids.append(k)
-#             sids.append(sent['sentence_id'])
-
-#     return (lines, eids, sids)
-
 def read_input_file(input_path):
     """读取预测的文件"""
     lines = []
@@ -68,7 +52,6 @@ def read_input_file(input_path):
             lines.append(words)
 
     return lines
-
 
 
 def convert_input_file_to_tensor_dataset(lines,

@@ -1,13 +1,11 @@
-# -*- coding:utf-8 -*-
 import re
-import json
+
 
 def write_output(seq_preds_list, lines):
     outputs = []
     for i in range(len(seq_preds_list)):
         pred_seq = seq_preds_list[i]
         org_words = lines[i]
-        # print(" ".join(pred_seq))
         sent = ""
         flag = False
         tmp = "O"
@@ -25,16 +23,12 @@ def write_output(seq_preds_list, lines):
                 sent += "{"+w
                 flag = True
             elif tag.startswith("I-"):
-                # if not flag:
-                #     sent += "{"
                 sent += w
-                # flag = True
             tmp = tag.split("-")[-1]
 
         if flag:
             sent += "|"+tmp+"}"
             flag = False
-        # print(sent)
 
         outputs.append(sent)
 
@@ -142,11 +136,7 @@ def combine_conflict(word_lst1, label_lst1, label_lst2, label_lst1_new, label_ls
                     label_lst.append("O")
             start = None
         elif lb1 == "O" and lb2 != "O":
-            # if lb2.endswith("-PER") and ((lb3=="O" and label_lst3[idx+1].endswith("-PER")) or (lb3.endswith("-PER") and (label_lst2_new[idx-1]=="O" or label_lst3[idx-2]=="O") and (label_lst3[idx-1].endswith("-PER") or label_lst3[idx-2].endswith("-PER")))):
             if idx==0 and lb2.endswith("-PER") and lb3=="O" and label_lst2_new[idx+1].endswith("-PER") and label_lst2_new[idx+2].endswith("-PER") and label_lst3[idx+1].endswith("-PER") and label_lst3[idx+2].endswith("-PER"):
-                # label_lst.append(lb3)
-                # cnt += 1
-                # continue
                 lb2 = "O"
                 label_lst2_new[idx+1] = label_lst2_new[idx+1].replace("I-", "B-")
                 cnt += 1
@@ -180,7 +170,6 @@ def combine_conflict(word_lst1, label_lst1, label_lst2, label_lst1_new, label_ls
     return label_lst
 
 def span_match(sen):
-    # ents = re.findall("\{([^|]+)\|PER|OFI\}", sen)
 
     all_ents = []
 
@@ -205,7 +194,6 @@ def combine_book(target_sen, sen_1, sen_2, sen_3):
     for bk in set(book):
         if len(bk)>2 and book.count(bk)<2:
             target_sen = target_sen.replace("{"+bk+"|BOOK}", bk)
-            # print(bk)
 
     return target_sen
 
@@ -216,7 +204,6 @@ def cal_disconsis(consist_cal):
         if "PER" in c and "OFI" in c:
             if len(c["PER"])>1 and len(c["OFI"])>1 and (len(c["PER"])/len(c["OFI"])*1.0 >= 0.5):
                 it_.append(item)
-                # print(item, len(c["PER"])/len(c["OFI"]), len(c["OFI"])/len(c["PER"]))
     return set(it_)
 
 def deal_disconsis(consist_cal, sen):
@@ -238,12 +225,6 @@ def deal_disconsis(consist_cal, sen):
                 sen = sen.replace("{"+i2+"|OFI}", i2)
 
 
-    # per = re.findall("\{([^|]+)\|PER\}", sen)
-    # for item in per:
-    #     if item in consist_cal:
-    #         if sen.count(item) < 2 and item+"|PER}{" not in sen:
-    #             sen = sen.replace("{"+item+"|PER}", item)
-    #             print(sen)
     pattern = r"、\{([^}]+)\|OFI\}\{([^}]+)\|OFI\}，"
     matches = re.findall(pattern, sen)
     if len(matches) > 0:
@@ -298,134 +279,3 @@ def consistency_train(train_data, sen, sen_know, sen_slide, sen_ib4):
 
     return sen
     
-
-fw = open("test_submission_submit.txt", "w", encoding="utf-8")
-
-seq_preds_list = []
-lines = []
-outputs_org = []
-IB_4 = []
-IB_10 = []
-seq_lb = []
-with open("submission_test_Kfold.txt", "r", encoding="utf-8") as f1, open("submission_test_IB_10.txt", "r", encoding="utf-8") as f2, open("submission_test_IB_4.txt", "r", encoding="utf-8") as f3:
-    for idx, (line1, line2, line3) in enumerate(zip(f1, f2, f3)):
-        IB_4.append(line3.strip())
-        IB_10.append(line2.strip())
-        seq_lb.append(line1.strip())
-
-        word_lst1, label_lst1 = get_labels(line1.strip())
-        word_lst2, label_lst2 = get_labels(line2.strip())
-        word_lst3, label_lst3 = get_labels(line3.strip())
-
-        label_lst1_new = mask_labels(label_lst1, length=False)
-        label_lst2_new = mask_labels(label_lst2, length=True)
-        assert len(label_lst1_new) == len(label_lst2_new) == len(word_lst1)
-
-        label_lst = combine_conflict(word_lst1, label_lst1, label_lst2, label_lst1_new, label_lst2_new, label_lst3)
-        # print(str(idx+1)+"#")
-        # print(label_lst1_new)
-        # print(label_lst2_new)
-        # print(label_lst)
-        # print("######")
-        seq_preds_list.append(label_lst)
-        lines.append(word_lst1)
-
-outputs = write_output(seq_preds_list, lines)
-
-PER_vocab = []
-with open("PER_vocab.txt", "r", encoding="utf-8") as f:
-    for line in f:
-        PER_vocab.append(line.strip())
-OFI_vocab = []
-with open("OFI_vocab.txt", "r", encoding="utf-8") as f:
-    for line in f:
-        OFI_vocab.append(line.strip())
-
-with open("conflicts_filter.json", "r", encoding="utf-8") as f:
-    consist_cal = json.load(f)
-
-data_train = []
-with open("GuNER2023_train.txt", "r", encoding="utf-8") as f:
-    for line in f:
-        data_train.append(line.strip())
-
-result_know = []
-with open("submission_test_know.txt", "r", encoding="utf-8") as f:
-    for line in f:
-        result_know.append(line.strip())
-
-result_slide = []
-with open("submission_test_slide.txt", "r", encoding="utf-8") as f:
-    for line in f:
-        result_slide.append(line.strip())
-
-
-it_ = cal_disconsis(consist_cal)
-
-pattern_ = re.compile(r"\{\w+\|PER\}，(?=\{\w+\|OFI\})")
-for sen, ib, ib10, sql, rk, rs in zip(outputs, IB_4, IB_10, seq_lb, result_know, result_slide):
-    per = set(re.findall("\{([^|]+)\|PER\}", sen))
-    text = sen
-    for item in per:
-        if len(item) < 2 and text.count(item) < 3:
-            continue
-        pattern = r"(?<!\{)"+item+r"(?!\|PER\})"
-        replacement = r"{"+item+r"|PER}"
-        text = re.sub(pattern, replacement, text)
-    text = text.replace("{]", "]{")
-
-    text = span_match(text)
-    for p in PER_vocab:
-        if p in text and p not in re.findall("\{([^|]+)\|PER\}", text) and p+"|PER}" not in text:
-            if p in re.findall("\{([^|]+)\|OFI\}", text):
-                # text = text.replace("{"+p+"|OFI}", "{"+p+"|PER}")
-                if len(p) > 2:
-                    text = text.replace("{"+p+"|OFI}", "{"+p+"|PER}")
-                else:
-                    text = text.replace("{"+p+"|OFI}", p)
-            else:
-                text = text.replace(p, "{"+p+"|PER}")
-
-    for p in OFI_vocab:
-        if p in text and p not in re.findall("\{([^|]+)\|OFI\}", text) and p+"|OFI}" not in text:
-            if p in re.findall("\{([^|]+)\|PER\}", text):
-                # text = text.replace("{"+p+"|PER}", "{"+p+"|OFI}")
-                if len(p) > 2:
-                    text = text.replace("{"+p+"|PER}", "{"+p+"|OFI}")
-                else:
-                    text = text.replace("{"+p+"|PER}", p)
-            else:
-                text = text.replace(p, "{"+p+"|OFI}")
-
-    text = text if len(pattern_.findall(text)) >= len(pattern_.findall(ib)) else ib
-
-    pattern_q = re.compile(r"(?<=「\{\w\|PER\})\w(?=\{\w\|PER\})")
-    su = pattern_q.findall(text)
-    if len(su) > 0:
-        text = text.replace("|PER}"+su[0]+"{", "|PER}{"+su[0])
-
-    ofi1 = re.findall("\{([^|]+)\|OFI\}", ib)
-    ofi2 = re.findall("\{([^|]+)\|OFI\}", sen)
-    diff = list(set(ofi1)-set(ofi2)) if len(ofi1)>len(ofi2) else set()
-    if len(diff)>0 and len(diff[0])>2:
-        text = ib
-
-    per2 = re.findall("\{([^|]+)\|PER\}", sen)
-    if len(set(ofi1)&set(per2)) > 0:
-        for item in set(ofi1)&set(per2):
-            text = text.replace("{"+item+"|PER}", item)
-    text = combine_book(text, sql, ib10, ib)
-
-    text = deal_disconsis(it_, text)
-
-    text = consistency_train(data_train, text, rk, rs, ib)
-
-    fw.write(text+"\n")
-
-
-		# for w, l in zip(word_lst, label_lst):
-		# 	fw.write(w+" "+l+"\n")
-		# fw.write("\n")
-fw.close()
-
-

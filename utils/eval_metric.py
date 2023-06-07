@@ -3,8 +3,6 @@
 Sorry for have not reimplemented the code.
 Copied from SpanNER.
 """
-
-
 import torch
 
 
