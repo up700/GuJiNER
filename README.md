@@ -1,4 +1,3 @@
-## KDSec_IIE
 
 ## Requirements
 - python==3.7.4
@@ -74,13 +73,15 @@
 
 ## How to run
 
-在配置好环境后，运行以下命令开始训练。根据GPU数量和显存大小进行更改与配置。
+在将所有的checkpoint文件夹解压放在根目录后，可以通过以下命令，对最终结果进行预测。
+```console
+sh start_predict.sh
+```
+
+在配置好环境后，运行以下命令也可开始重新训练。根据GPU数量和显存大小进行更改与配置。
 ```console
 sh start_train.sh
 ```
 
-在完成所有模型的训练后，可以通过以下命令，对最终结果进行预测。
-```console
-sh start_predict.sh
-```
+
 
