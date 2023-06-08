@@ -73,7 +73,7 @@
 
 ## How to run
 
-在将所有的checkpoint文件夹解压放在根目录后，可以通过以下命令，对最终结果进行预测。最终结果文件为predict/test_submission_submit.txt
+在将所有的checkpoint文件夹解压放在根目录后，可以通过以下命令，对最终结果进行预测。最终结果文件为**predict/test_submission_submit.txt**
 ```console
 sh start_predict.sh
 ```
